@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -17,6 +18,7 @@ import (
 	"github.com/neuvector/neuvector/share/cluster"
 	"github.com/neuvector/neuvector/share/container"
 	"github.com/neuvector/neuvector/share/global"
+	"github.com/neuvector/neuvector/share/migration"
 	"github.com/neuvector/neuvector/share/system"
 	"github.com/neuvector/neuvector/share/utils"
 	"github.com/neuvector/scanner/common"
@@ -161,6 +163,7 @@ func main() {
 	license := flag.String("license", "", "Scanner license")         // it means on-demand stand-alone scanner
 	image := flag.String("image", "", "Scan image")                  // overwrite registry, repository and tag
 	pid := flag.Int("pid", 0, "Scan host or container")
+	migrationGRPCPort := flag.Uint("migration_port", cluster.DefaultMigrationGRPCPort, "Cluster Migration GRPC port")
 	registry := flag.String("registry", "", "Scan image registry")
 	repository := flag.String("repository", "", "Scan image repository")
 	tag := flag.String("tag", "latest", "Scan image tag")
@@ -209,6 +212,17 @@ func main() {
 
 	onDemand := false
 	showTaskDebug := true
+
+	// TODO: Is this the right place to reload cert?
+
+	if _, _, _, err := migration.ReloadCert(); err != nil {
+		// Failed to reload cert.
+		// TODO: better check
+		if !strings.Contains(err.Error(), "not found") {
+			// TODO: Make sure this is the only way to deal with the error
+			log.WithError(err).Fatal("failed to reload kubernetes secret")
+		}
+	}
 
 	// If license parameter is given, this is an on-demand scanner, no register to the controller,
 	// but if join address is given, the scan result are sent to the controller.
@@ -341,7 +355,6 @@ func main() {
 
 	// Block until server is up.
 	grpcServer := startGRPCServer()
-	defer grpcServer.Stop()
 
 	if !(*noWait) {
 		// Intentionally introduce some delay so scanner IP can be populated to all enforcers
@@ -372,6 +385,20 @@ func main() {
 		selfID = *adv
 	}
 
+	migrationGRPCServer, err := migration.StartMigrationGRPCServer(uint16(*migrationGRPCPort), []func([]byte, []byte, []byte) error{
+		func(cacert []byte, cert []byte, key []byte) error {
+			// TODO: Make sure all gRPC call retries.
+			// TODO: Make sure server can completes normally without resource leak.
+			// TODO: Check race condition
+			grpcServer.GracefulStop()
+			grpcServer = startGRPCServer()
+			return nil
+		},
+	})
+	if err != nil {
+		log.WithError(err).Error("failed to start migration gRPC server")
+	}
+
 	// Use the original address, which is the service name, so when controller changes,
 	// new IP can be resolved
 	go connectController(*dbPath, *adv, *join, selfID, (uint32)(*advPort), (uint16)(*joinPort))
@@ -379,4 +406,6 @@ func main() {
 
 	log.Info("Exiting ...")
 	scannerDeregister(*join, (uint16)(*joinPort), selfID)
+	migrationGRPCServer.Stop()
+	grpcServer.Stop()
 }
