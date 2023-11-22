@@ -8,15 +8,18 @@ replace (
 	github.com/cri-o/cri-o => github.com/cri-o/cri-o v1.15.4
 	github.com/docker/distribution => github.com/docker/distribution v2.8.0-beta.1+incompatible
 	github.com/kubernetes/cri-api => k8s.io/cri-api v0.22.3
+	github.com/neuvector/neuvector => github.com/holyspectral/neuvector v0.0.0-20231216012507-4abd379554a0
 	github.com/opencontainers/runc => github.com/opencontainers/runc v1.0.0-rc5
-	golang.org/x/net => golang.org/x/net v0.0.0-20170421174939-0b588ed7a0cd
+	github.com/russellhaering/gosaml2 => github.com/holyspectral/gosaml2 v0.0.0-20231003195827-3d916621a704
+	golang.org/x/net => golang.org/x/net v0.0.0-20201022231255-08b38378de70
+	golang.org/x/sys => golang.org/x/sys v0.0.0-20220209214540-3681064d5158
 	google.golang.org/grpc => google.golang.org/grpc v1.30.1
-	k8s.io/api => k8s.io/api v0.20.15
+	k8s.io/api => k8s.io/api v0.21.14
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.20.15
-	k8s.io/apimachinery => k8s.io/apimachinery v0.17.17
+	k8s.io/apimachinery => k8s.io/apimachinery v0.21.14
 	k8s.io/apiserver => k8s.io/apiserver v0.20.15
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.20.15
-	k8s.io/client-go => k8s.io/client-go v0.20.15
+	k8s.io/client-go => k8s.io/client-go v0.21.14
 	k8s.io/cloud-provider => k8s.io/cloud-provider v0.20.15
 	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.20.15
 	k8s.io/code-generator => k8s.io/code-generator v0.20.15
@@ -37,6 +40,7 @@ replace (
 	k8s.io/mount-utils => k8s.io/mount-utils v0.20.14
 	k8s.io/pod-security-admission => k8s.io/pod-security-admission v0.22.5
 	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.20.15
+
 )
 
 require (
@@ -46,6 +50,7 @@ require (
 	github.com/jedib0t/go-pretty/v6 v6.4.6
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/neuvector/neuvector v0.0.0-20231105024949-6007c837f743
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.8.2 // indirect
 	google.golang.org/grpc v1.40.0

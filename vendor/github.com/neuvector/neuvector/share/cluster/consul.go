@@ -156,9 +156,9 @@ func createConfigFile(cc *ClusterConfig) error {
 	sa = append(sa, "    \"skip_leave_on_interrupt\": false,\n")
 	sa = append(sa, "    \"leave_on_terminate\": true,\n")
 	sa = append(sa, fmt.Sprintf("    \"encrypt\": \"%s\",\n", gossipSharedKey()))
-	sa = append(sa, fmt.Sprintf("    \"ca_file\": \"%s%s\",\n", internalCertDir, internalCACert))
-	sa = append(sa, fmt.Sprintf("    \"cert_file\": \"%s%s\",\n", internalCertDir, internalCert))
-	sa = append(sa, fmt.Sprintf("    \"key_file\": \"%s%s\",\n", internalCertDir, internalCertKey))
+	sa = append(sa, fmt.Sprintf("    \"ca_file\": \"%s%s\",\n", InternalCertDir, InternalCACert))
+	sa = append(sa, fmt.Sprintf("    \"cert_file\": \"%s%s\",\n", InternalCertDir, InternalCert))
+	sa = append(sa, fmt.Sprintf("    \"key_file\": \"%s%s\",\n", InternalCertDir, InternalCertKey))
 	sa = append(sa, fmt.Sprintf("    \"verify_incoming\": true,\n"))
 	sa = append(sa, fmt.Sprintf("    \"verify_outgoing\": true,\n"))
 	if cc.Debug {
@@ -1205,7 +1205,7 @@ func compareStoreKeys(cache map[string]uint64, kvs api.KVPairs) []string {
 	}
 
 	var ret []string
-	for key, _ := range cache {
+	for key := range cache {
 		if _, ok := m[key]; ok {
 			continue
 		}
@@ -1334,7 +1334,7 @@ func (m *consulMethod) RegisterExistingWatchers() {
 		go registerNodeUpdate()
 	}
 	keyWatcherMutex.RLock()
-	for key, _ := range keyWatchers {
+	for key := range keyWatchers {
 		go registerKeyUpdate(key)
 	}
 	keyWatcherMutex.RUnlock()
@@ -1342,7 +1342,7 @@ func (m *consulMethod) RegisterExistingWatchers() {
 		go registerStateUpdate()
 	}
 	storeWatcherMutex.RLock()
-	for store, _ := range storeWatchers {
+	for store := range storeWatchers {
 		go registerStoreUpdate(store, storeWatchersCongestCtl[store])
 	}
 	storeWatcherMutex.RUnlock()
