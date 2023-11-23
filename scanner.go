@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/neuvector/neuvector/controller/api"
@@ -392,6 +393,9 @@ func main() {
 			// TODO: Check race condition
 			grpcServer.GracefulStop()
 			grpcServer = startGRPCServer()
+			if err := cluster.ReloadAllGRPCClients(); err != nil {
+				return errors.Wrap(err, "failed to reload gRPC clients")
+			}
 			return nil
 		},
 	})
