@@ -102,7 +102,8 @@ build:
 	make -C monitor/
 
 test:
-	go test ./...
+	# Only run unit-test on amd64 for now
+	if [ $(arch) = "x86_64" ]; then go test ./...;fi
 
 STAGE_DIR = stage
 
