@@ -3,7 +3,8 @@
 #
 FROM registry.suse.com/bci/golang:1.22.7 AS builder
 ARG VULNDB_SERVER=https://d29ey0gy8sfz57.cloudfront.net
-ARG VERSION=LATEST # Also used as vulndb ver
+ARG VERSION
+ARG VULNDBVER=LATEST
 ARG SIGSTORE_VERSION=main
 
 RUN zypper in -y wget
@@ -12,7 +13,7 @@ RUN zypper in -y wget
 COPY . /src
 WORKDIR /src
 RUN git clone --depth=1 https://github.com/neuvector/sigstore-interface --branch "${SIGSTORE_VERSION}" --single-branch sigstore-interface && make -C sigstore-interface/
-RUN mkdir -p data/ && wget $VULNDB_SERVER/${VERSION:1}/cvedb.regular -O data/cvedb.regular
+RUN mkdir -p data/ && wget $VULNDB_SERVER/${VULNDBVER}/cvedb.regular -O data/cvedb.regular
 RUN make slsa_all
 
 #

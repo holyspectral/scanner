@@ -76,6 +76,9 @@ ifeq ($(VERSION),)
 			VERSION = $(GIT_TAG)
 		endif
 	endif
+	VULNDBVER=LATEST
+else
+	VULNDBVER=$(VERSION:1)
 endif
 
 ifeq ($(TAG),)
@@ -122,5 +125,5 @@ buildx-machine:
 push-image: buildx-machine
 	$(IMAGE_BUILDER) build -f package/Dockerfile \
 		--builder $(MACHINE) $(IMAGE_ARGS) $(IID_FILE_FLAG) $(BUILDX_ARGS) \
-		--build-arg VERSION=$(VERSION) --build-arg COMMIT=$(COMMIT) --platform=$(TARGET_PLATFORMS) -t "$(REPO)/scanner:$(TAG)" --push .
+		--build-arg VERSION=$(VERSION) --build-arg COMMIT=$(COMMIT) --build-arg VULNDBVER=$(VULNDBVER) --platform=$(TARGET_PLATFORMS) -t "$(REPO)/scanner:$(TAG)" --push .
 	@echo "Pushed $(IMAGE)"
