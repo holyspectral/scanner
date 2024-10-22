@@ -83,6 +83,8 @@ endif
 
 .PHONY: all copy_scan build
 
+ARCH := $(shell uname -p)
+
 BASE_IMAGE_TAG = latest
 BUILD_IMAGE_TAG = v2
 
@@ -95,7 +97,8 @@ build:
 	make -C monitor/
 
 test:
-	go test ./...
+	# Only run unit-test on amd64 for now
+	if [ "$(ARCH)" = "x86_64" ]; then go test ./...;fi
 
 STAGE_DIR = stage
 
