@@ -55,3 +55,12 @@ jobs:
     - name: Publish neuvector
       run: |
         docker buildx imagetools create --tag docker.io/holyspectral/scanner:${{ github.ref_name }} docker.io/holyspectral/neuvector-scanner:${{ github.ref_name }}
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [publish]
+    steps:
+      - name: Notify downstream job
+        run: |
+          jq -n '{"ref":"master","inputs":{"version":"'${{ github.ref_name }}'", "org": "holyspectral"}}' | gh api -H "Accept: application/vnd.github+json" --method POST /repos/holyspectral/release/actions/workflows/build-v5-scanner.yaml/dispatches --input -
+
