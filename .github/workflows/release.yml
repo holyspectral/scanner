@@ -59,6 +59,8 @@ jobs:
   notify:
     runs-on: ubuntu-latest
     needs: [publish]
+    env:
+      GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
     steps:
       - name: Notify downstream job
         run: |
