@@ -74,6 +74,7 @@ var selfID string
 var isGetCapsActivate bool
 
 func dbRead(path string, maxRetry int, output string) map[string]*share.ScanVulnerability {
+	os.Open("asd")
 	dbFile := path + share.DefaultCVEDBName
 	encryptKey := common.GetCVEDBEncryptKey()
 
