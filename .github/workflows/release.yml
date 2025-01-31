@@ -26,9 +26,6 @@ jobs:
       run: |
         TARGET=${{ github.ref_name }}
         echo "TAG=${TARGET#v}" >> $GITHUB_ENV
-    - name: Download vulnerability database
-      run: |
-        wget https://${{ secrets.VULNDB_SERVER }}/${TAG}/cvedb.regular -O data/cvedb.regular
     - name: Publish neuvector manifest
       uses: holyspectral/ecm-distro-tools/actions/publish-image@use-qemu-8-1-5
       with:
