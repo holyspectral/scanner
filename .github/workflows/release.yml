@@ -38,7 +38,7 @@ jobs:
       run: |
         wget https://${{ secrets.VULNDB_SERVER }}/${TAG}/cvedb.regular -O data/cvedb.regular
     - name: Publish neuvector manifest
-      uses: rancher/ecm-distro-tools/actions/publish-image@master
+      uses: holyspectral/ecm-distro-tools/actions/publish-image@use-qemu-8-1-5
       with:
         push-to-public: true
         push-to-prime: false
@@ -51,7 +51,7 @@ jobs:
         public-username: ${{ env.DOCKER_USERNAME }}
         public-password: ${{ env.DOCKER_PASSWORD }}
     - name: Publish rancher manifest
-      uses: rancher/ecm-distro-tools/actions/publish-image@master
+      uses: holyspectral/ecm-distro-tools/actions/publish-image@use-qemu-8-1-5
       env:
         IMAGE_PREFIX: neuvector-
       with:
