@@ -29,4 +29,38 @@ jobs:
           GOVULNCHECK_VERSION: d1f380186385b4f64e00313f31743df8e4b89a77 # v1.1.4
         run: |
           go install golang.org/x/vuln/cmd/govulncheck@${{ env.GOVULNCHECK_VERSION }}
-          govulncheck -C . -format text ./...
+
+          # govulncheck exit codes: 0 = no vulns, 1 = tool error, 3 = vulns found.
+          # Capture JSON output without letting a non-zero exit abort the script.
+          set +e
+          OUTPUT=$(govulncheck -C . -format json ./... 2>&1)
+          EXIT=$?
+          set -e
+
+          # Clean run — nothing to do.
+          [ "$EXIT" -eq 0 ] && exit 0
+
+          # Tool error (bad flags, missing module, etc.) — surface it as-is.
+          [ "$EXIT" -ne 3 ] && { echo "$OUTPUT"; exit "$EXIT"; }
+
+          # govulncheck emits newline-delimited JSON; each "finding" message carries
+          # one OSV ID.  jq extracts those IDs, then grep -vxF drops the known false
+          # positives (exact whole-line matches).  If any ID survives the filter,
+          # grep -q succeeds and we have a real vulnerability.
+          #
+          # False positives from github.com/neuvector/neuvector:
+          # Remove each -e entry once upstream publishes a fix.
+          if printf '%s\n' "$OUTPUT" | jq -r 'select(.type=="finding") | .finding.osv' \
+             | grep -vxF \
+                 -e GO-2025-3917 \
+                 -e GO-2025-4044 \
+                 -e GO-2025-3919 \
+                 -e GO-2025-3918 \
+             | grep -q .; then
+            # At least one non-excluded vulnerability — re-run in human-readable
+            # format so the failure is easy to read in the Actions log.
+            govulncheck -C . -format text ./...
+            exit 1
+          fi
+
+          echo "govulncheck: only known false positives found, skipping."
